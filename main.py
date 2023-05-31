@@ -1,6 +1,8 @@
 print("pacman time :)")
 "https://docs.google.com/document/d/15NM6PDM-4rxv42vfmq85V0iRdOQ-7rnTjBvFhplXGLs/edit"
 
+"ZMENA"
+
 with open("board") as f:
     lines = f.read().splitlines()
 
