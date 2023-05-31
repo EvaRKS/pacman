@@ -1,4 +1,17 @@
 print("pacman time :)")
+"https://docs.google.com/document/d/15NM6PDM-4rxv42vfmq85V0iRdOQ-7rnTjBvFhplXGLs/edit"
+
+with open("board") as f:
+    lines = f.read().splitlines()
+
+board = []
+
+for line in lines:
+    rozdelenej_line = line.split(", ")
+
+    board.append(rozdelenej_line)
+
+print(board)
 
 import pygame
 
