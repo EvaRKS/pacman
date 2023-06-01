@@ -1,3 +1,5 @@
+import pygame
+
 print("pacman time :)")
 "https://docs.google.com/document/d/15NM6PDM-4rxv42vfmq85V0iRdOQ-7rnTjBvFhplXGLs/edit"
 
@@ -16,15 +18,13 @@ for line in lines:
         # rozdelenej_line[cislo] = int(rozdelenej_line[cislo])
     board.append(rozdelenej_line)
 
-import pygame
-
 SIZE = (28, 31)
 
 TILE = 0
 VI_CONVERT = 0
 SI_CONVERT = 0
 
-image = pygame.image.load("assets\Arcade - Pac-Man - General Sprites.png")
+image = pygame.image.load("./assets/sprites.png")
 SIRKA_IMG = image.get_width()
 VYSKA_IMG = image.get_height()
 
