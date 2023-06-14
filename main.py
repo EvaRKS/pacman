@@ -1,4 +1,5 @@
 import pygame
+import random
 
 print("pacman time :)")
 "https://docs.google.com/document/d/15NM6PDM-4rxv42vfmq85V0iRdOQ-7rnTjBvFhplXGLs/edit"
@@ -10,6 +11,8 @@ with open("board") as f:
 
 board = []
 entry = 3
+souradnice_pacman_board = (14, 11)
+souradnice_ghost_board_seznam = [(11,14), (12,14), (15,14), (16,14)]
 
 for line in lines:
     rozdelenej_line = line.split(", ")
@@ -34,8 +37,9 @@ display = pygame.display.set_mode((SIRKA_DISP, VYSKA_DISP))
 
 K = VYSKA_DISP/VYSKA_IMG
 
-
 def background():
+    display.fill("black")
+
     global TILE, VI_CONVERT, SI_CONVERT, image
 
     VI_CONVERT = VYSKA_DISP
@@ -63,8 +67,67 @@ def background():
             else:
                pass
 
+
+
+
 def draw_pacman():
-    display.blit(image, (0, 0), (SI_CONVERT * (2/3) + 2*TILE[0], 0, TILE[0]*K, TILE[0]*K))
+    global souradnice_pacman_board
+    print(souradnice_pacman_board)
+
+    # velikost_jednoho_ctverecku = VI_CONVERT/SIZE[0]
+    velikost_jednoho_ctverecku = TILE[0]
+    stred_jednoho_ctverecku = velikost_jednoho_ctverecku/2
+
+    souradnice_pacman = (souradnice_pacman_board[0]*velikost_jednoho_ctverecku-stred_jednoho_ctverecku, souradnice_pacman_board[1]*velikost_jednoho_ctverecku-stred_jednoho_ctverecku)
+
+    pacman = image
+    pacman.set_colorkey((0,0,0))
+    display.blit(image, souradnice_pacman, (SI_CONVERT * (2/3) + 2.2*TILE[0], 0, TILE[0]*2, TILE[0]*2))
+
+def draw_ghost(x):
+    global souradnice_pacman_board
+
+    ghost = image
+    ghost.set_colorkey((0,0,0))
+
+    velikost_jednoho_ctverecku = TILE[0]
+    stred_jednoho_ctverecku = velikost_jednoho_ctverecku / 2
+
+    souradnice_ghost_board = x
+    souradnice_ghost = (souradnice_ghost_board[0] * velikost_jednoho_ctverecku - stred_jednoho_ctverecku,
+                        souradnice_ghost_board[1] * velikost_jednoho_ctverecku - stred_jednoho_ctverecku)
+
+    display.blit(ghost, souradnice_ghost, (SI_CONVERT*(2/3), TILE[0]*(8+2*i), 50, 50))
+
+def random_neco(souradnice):
+    x = souradnice[0]
+    y = souradnice[1]
+
+    # nahodny cislo 1-4
+    nahodny_cislo = random.randint(1, 4)
+
+    # kazdy cislo znamena neco = +1 x, -1 x, +1y, -1y
+    if nahodny_cislo == 1:
+        return x + 1, y
+    elif nahodny_cislo == 2:
+        return x - 1, y
+    elif nahodny_cislo == 3:
+        return x, y + 1
+    else:
+        return x, y - 1
+
+
+def end_screen():
+    display.fill("black")
+    pygame.font.init()
+    my_font = pygame.font.SysFont('Comic Sans MS', 100)
+    text_surface = my_font.render('rip', True, "white")
+    display.blit(text_surface, (250, 250))
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
 
 
 print(len(board))
@@ -72,10 +135,46 @@ print(len(board))
 
 while True:
     background()
-    draw_pacman()
+
+    predchozi_souradnice_board = souradnice_pacman_board
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+        if event.type == pygame.KEYDOWN:
+            for i in range(0, 4):
+                prozatimni_ghost_board_souradnice = random_neco(souradnice_ghost_board_seznam[i])
+                if board[souradnice_pacman_board[1]][souradnice_pacman_board[0]] != 2:
+                    souradnice_ghost_board_seznam[i] = prozatimni_ghost_board_souradnice
+
+            if event.key == pygame.K_UP:
+                souradnice_pacman_board = (souradnice_pacman_board[0], souradnice_pacman_board[1]-1)
+            if event.key == pygame.K_DOWN:
+                souradnice_pacman_board = (souradnice_pacman_board[0], souradnice_pacman_board[1]+1)
+            if event.key == pygame.K_LEFT:
+                souradnice_pacman_board = (souradnice_pacman_board[0]-1, souradnice_pacman_board[1])
+            if event.key == pygame.K_RIGHT:
+                souradnice_pacman_board = (souradnice_pacman_board[0]+1, souradnice_pacman_board[1])
+
+    if souradnice_pacman_board[0] < 0:
+        souradnice_pacman_board = (27, souradnice_pacman_board[1])
+    if souradnice_pacman_board[0] > 27:
+        souradnice_pacman_board = (0, souradnice_pacman_board[1])
+
+    if board[souradnice_pacman_board[1]][souradnice_pacman_board[0]] == 2:
+        souradnice_pacman_board = predchozi_souradnice_board
+    elif board[souradnice_pacman_board[1]][souradnice_pacman_board[0]] == 1:
+        board[souradnice_pacman_board[1]][souradnice_pacman_board[0]] = 0
+        draw_pacman()
+    elif board[souradnice_pacman_board[1]][souradnice_pacman_board[0]] == 3:
+        board[souradnice_pacman_board[1]][souradnice_pacman_board[0]] = 0
+        draw_pacman()
+    else:
+        draw_pacman()
+
+
+    draw_ghost()
+
 
     pygame.display.flip()
 
